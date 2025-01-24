@@ -1,0 +1,24 @@
+{
+  "originHash" : "46e92679403a5edfbb0cf0fe6e84c7a56facd23a5c8d4dc968a330b0e2bb2c6b",
+  "pins" : [
+    {
+      "identity" : "sdk-cards-ios-framework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Wantsa/sdk-cards-ios-framework",
+      "state" : {
+        "revision" : "2ef33faebc5b1053d54c359daf21c5482aae33ba",
+        "version" : "0.0.11"
+      }
+    },
+    {
+      "identity" : "sdk-model-ios-framework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Wantsa/sdk-model-ios-framework",
+      "state" : {
+        "revision" : "ba5ab5dbd2193c860cf279d3558284f1124e37fd",
+        "version" : "0.0.4"
+      }
+    }
+  ],
+  "version" : 3
+}
