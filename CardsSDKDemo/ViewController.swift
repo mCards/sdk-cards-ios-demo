@@ -9,8 +9,13 @@ import UIKit
 import AuthSDK
 import CoreSDK
 import CardsSDK
+import PassKit
 
 class ViewController: UIViewController {
+    // MARK: - Outlets
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var addToWalletButton: PKAddPassButton!
+    
     private var accessToken = ""
     private var isLoggedIn: Bool { !accessToken.isEmpty }
     private var userFullName = ""
@@ -39,10 +44,13 @@ class ViewController: UIViewController {
     }
     
     private func login() {
-        let savedPhoneNumber = "" // Save phone number used to pre-populate the login form
+        let savedPhoneNumber = "" // Saved phone number used to pre-populate the login form
         let loginArgs = LoginArgs(savedPhoneNumber: savedPhoneNumber)
         
+        activityIndicator.startAnimating()
         AuthSdkProvider.shared.login(args: loginArgs) { [weak self] result in
+            self?.activityIndicator.stopAnimating()
+            
             switch result {
             case .success(let authSuccess):
                 // Get any required data
@@ -67,7 +75,11 @@ class ViewController: UIViewController {
     }
     
     private func getCards() {
+        activityIndicator.startAnimating()
+        
         CardsSdkProvider.shared.getCards { [weak self] result in
+            self?.activityIndicator.stopAnimating()
+            
             switch result {
             case .success(let cards):
                 guard !cards.isEmpty else {
@@ -120,6 +132,10 @@ class ViewController: UIViewController {
         default:
             break
         }
+    }
+    
+    @IBAction func tappedLogin(_ sender: Any) {
+        login()
     }
 }
 
