@@ -16,16 +16,21 @@ class ViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var addToWalletButton: PKAddPassButton!
     
+    // MARK: - Properties
     private var accessToken = ""
     private var isLoggedIn: Bool { !accessToken.isEmpty }
     private var userFullName = ""
     private var card: Card!
 
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        addToWalletButton.addTarget(self, action: #selector(addCardToWallet), for: .touchUpInside)
         setupAuthSDK()
     }
 
+    // MARK: - Methods
     private func setupAuthSDK() {
         let auth0ClientID = "DL8XpUmzegVl9dR8QpO9djDifTY7nGyd" // Auth0 client ID gotten from the mCards team
         let auth0Domain = "mcards-test.au.auth0.com" // Auth0 Domain gotten from the mCards team
@@ -100,7 +105,12 @@ class ViewController: UIViewController {
         handleCardWalletStatus(status: status)
     }
     
-    private func addCardToWallet() {
+    @objc private func addCardToWallet() {
+        guard isLoggedIn else {
+            print("Login Required")
+            return
+        }
+        
         CardsSdkProvider.shared.addCardToWallet(
             card: card,
             userDisplayName: userFullName
@@ -117,14 +127,11 @@ class ViewController: UIViewController {
     private func handleCardWalletStatus(status: CSDKWalletStatus) {
         switch status {
         case .notAdded:
-            print(status)
-//            addToWalletButton.isHidden = false
+            addToWalletButton.isHidden = false
         case .added:
-            print(status)
-//            addToWalletButton.isHidden = true
+            addToWalletButton.isHidden = true
         case .notActivated:
-            print(status)
-//            addToWalletButton.isHidden = true
+            addToWalletButton.isHidden = true
             /*
              Take any required additional action like showing a status text to the user
              prompting them to open the wallet app to activate the card.
@@ -134,6 +141,7 @@ class ViewController: UIViewController {
         }
     }
     
+    // MARK: - Actions
     @IBAction func tappedLogin(_ sender: Any) {
         login()
     }
@@ -154,6 +162,7 @@ extension ViewController: CSDKTokenRefreshCallback {
     }
 }
 
+// MARK: - LoggingCallback
 fileprivate class LoggingHandler: LoggingCallback {
     func log(message: String) {
         // Log Firebase message
