@@ -8,7 +8,7 @@ The mCards iOS Cards SDK Demo App demonstrates how to use the mCards iOS Cards S
 	- Remove a card from the digital wallet
 2. Fetch a user's mCard list
 3. Fetch the balances for a given mCard
-4. Diaplay an mCard's details
+4. Display an mCard's details
 
 # Importing
 The CardsSDK can be imported via SPM (Swift Package Manager).
