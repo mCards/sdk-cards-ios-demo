@@ -94,6 +94,7 @@ class ViewController: UIViewController {
                 
                 self?.card = cards[0]
                 self?.getCardWalletStatus()
+                print("Fetched card: \(self?.card.details?.title ?? "")")
             case .failure(let error):
                 print(error.localizedDescription)
             }
