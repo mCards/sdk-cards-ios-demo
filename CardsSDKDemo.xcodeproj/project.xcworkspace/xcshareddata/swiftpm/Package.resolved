@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Wantsa/sdk-auth-ios-framework",
       "state" : {
-        "revision" : "72a375000a2ef248731ba609c336e6a94269f9e4",
-        "version" : "0.0.1"
+        "revision" : "e59a75b663f72233a7c2d9094c16c079b14a065d",
+        "version" : "1.0.6"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Wantsa/sdk-cards-ios-framework",
       "state" : {
-        "revision" : "2ef33faebc5b1053d54c359daf21c5482aae33ba",
-        "version" : "0.0.11"
+        "revision" : "a1e9a9733bc68e2ca432d265474c297eab27fe05",
+        "version" : "1.0.0"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Wantsa/sdk-model-ios-framework",
       "state" : {
-        "revision" : "ba5ab5dbd2193c860cf279d3558284f1124e37fd",
-        "version" : "0.0.4"
+        "revision" : "68560b8d709e76fdb83d16350afe360341a2abb7",
+        "version" : "1.1.4"
       }
     }
   ],

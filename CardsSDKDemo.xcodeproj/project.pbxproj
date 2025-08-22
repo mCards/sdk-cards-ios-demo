@@ -397,7 +397,7 @@
 			repositoryURL = "https://github.com/Wantsa/sdk-cards-ios-framework";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.11;
+				minimumVersion = 1.0.0;
 			};
 		};
 		14CAF4242D44374900730918 /* XCRemoteSwiftPackageReference "sdk-model-ios-framework" */ = {
@@ -405,7 +405,7 @@
 			repositoryURL = "https://github.com/Wantsa/sdk-model-ios-framework";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.4;
+				minimumVersion = 1.1.4;
 			};
 		};
 		14CAF4362D48117900730918 /* XCRemoteSwiftPackageReference "sdk-auth-ios-framework" */ = {
@@ -413,7 +413,7 @@
 			repositoryURL = "https://github.com/Wantsa/sdk-auth-ios-framework";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.1;
+				minimumVersion = 1.0.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
