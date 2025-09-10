@@ -26,3 +26,9 @@ Implementing apps must take additional steps if using the Auth SDK and Auth0 as 
 - Go to the info tab of your app target settings
 - In the `URL Types` section, click the `+` button to add a new entry
 - Enter `auth0` into the `Identifier` field and `$(PRODUCT_BUNDLE_IDENTIFIER)` in the `URL Schemes` field. Leave other fields blank.
+
+# Documentation
+[Documentation site](https://mcards.readme.io/)
+
+[SDKs conceptual documentation](https://mcards.readme.io/docs/mcards-sdk-overview)
+Password: mCardsDevDocs
