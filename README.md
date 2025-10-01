@@ -31,4 +31,3 @@ Implementing apps must take additional steps if using the Auth SDK and Auth0 as 
 [Documentation site](https://mcards.readme.io/)
 
 [SDKs conceptual documentation](https://mcards.readme.io/docs/mcards-sdk-overview)
-Password: mCardsDevDocs
