@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Wantsa/sdk-auth-ios-framework",
       "state" : {
-        "revision" : "e59a75b663f72233a7c2d9094c16c079b14a065d",
-        "version" : "1.0.6"
+        "revision" : "09e6b9e0aff22803ba87f1c5197f70cc063bfa02",
+        "version" : "1.1.3"
       }
     },
     {
