@@ -394,10 +394,10 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		14CAF4212D44374100730918 /* XCRemoteSwiftPackageReference "sdk-cards-ios-framework" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Wantsa/sdk-cards-ios-framework";
+			repositoryURL = "https://github.com/mCards/sdk-cards-ios-framework";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.1.0;
 			};
 		};
 		14CAF4242D44374900730918 /* XCRemoteSwiftPackageReference "sdk-model-ios-framework" */ = {
@@ -405,15 +405,15 @@
 			repositoryURL = "https://github.com/Wantsa/sdk-model-ios-framework";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.4;
+				minimumVersion = 1.2.6;
 			};
 		};
 		14CAF4362D48117900730918 /* XCRemoteSwiftPackageReference "sdk-auth-ios-framework" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Wantsa/sdk-auth-ios-framework";
+			repositoryURL = "https://github.com/mCards/sdk-auth-ios-framework";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.4;
+				minimumVersion = 1.1.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
