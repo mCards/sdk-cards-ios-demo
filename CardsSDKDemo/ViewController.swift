@@ -10,6 +10,7 @@ import AuthSDK
 import CoreSDK
 import CardsSDK
 import PassKit
+import WebKit
 
 class ViewController: UIViewController {
     // MARK: - Outlets
@@ -20,13 +21,16 @@ class ViewController: UIViewController {
     private var accessToken = ""
     private var isLoggedIn: Bool { !accessToken.isEmpty }
     private var userFullName = ""
-    private var card: Card!
+    private var card: Card?
+    private var cards: [Card] = []
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         addToWalletButton.addTarget(self, action: #selector(addCardToWallet), for: .touchUpInside)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Set / change PIN", style: .plain, target: self, action: #selector(selectPinCard))
         setupAuthSDK()
     }
 
@@ -61,6 +65,8 @@ class ViewController: UIViewController {
                 // Get any required data
                 self?.accessToken = authSuccess.jwts.accessToken
                 self?.userFullName = authSuccess.user.fullName
+                self?.cards = []
+                self?.card = nil
                 
                 self?.setupCardsSDK()
                 self?.getCards()
@@ -87,14 +93,15 @@ class ViewController: UIViewController {
             
             switch result {
             case .success(let cards):
+                self?.cards = cards
+                self?.card = cards.first
                 guard !cards.isEmpty else {
                     print("User has no cards")
                     return
                 }
                 
-                self?.card = cards[0]
                 self?.getCardWalletStatus()
-                print("Fetched card: \(self?.card.details?.title ?? "")")
+                print("Fetched card: \(self?.card?.details?.title ?? "")")
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -102,12 +109,13 @@ class ViewController: UIViewController {
     }
     
     private func getCardWalletStatus() {
+        guard let card else { return }
         let status = CardsSdkProvider.shared.getCardWalletStatus(card: card)
         handleCardWalletStatus(status: status)
     }
     
     @objc private func addCardToWallet() {
-        guard isLoggedIn else {
+        guard isLoggedIn, let card else {
             print("Login Required")
             return
         }
@@ -125,6 +133,52 @@ class ViewController: UIViewController {
         }
     }
     
+    @objc private func selectPinCard() {
+        let eligibleCards = cards.filter { $0.cardIssuer == .MARQETA && $0.status == "active" }
+        guard !eligibleCards.isEmpty else {
+            showMessage("Log in with a UAT user who has an active Marqeta card first.")
+            return
+        }
+        let picker = UIAlertController(title: "Choose a card", message: nil, preferredStyle: .alert)
+        for selectedCard in eligibleCards {
+            picker.addAction(UIAlertAction(
+                title: "\(selectedCard.details?.title ?? "Card") •••• \(selectedCard.details?.last4 ?? "")",
+                style: .default
+            ) { [weak self] _ in self?.openPinManagement(for: selectedCard) })
+        }
+        picker.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(picker, animated: true)
+    }
+
+    private func openPinManagement(for selectedCard: Card) {
+        // A WebView navigation cannot use the SDK's API token-refresh interceptor.
+        activityIndicator.startAnimating()
+        AuthSdkProvider.shared.refreshTokens { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.activityIndicator.stopAnimating()
+                switch result {
+                case .success(let jwts):
+                    self.accessToken = jwts.accessToken
+                    self.setupCardsSDK()
+                    let controller = PinViewController(card: selectedCard, jwts: jwts) { [weak self] in
+                        // The issuer may still report PIN pending on this first refresh.
+                        self?.getCards()
+                    }
+                    self.present(UINavigationController(rootViewController: controller), animated: true)
+                case .failure(let error):
+                    self.showMessage(error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    private func showMessage(_ message: String) {
+        let alert = UIAlertController(title: "Cards SDK Demo", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
     private func handleCardWalletStatus(status: CSDKWalletStatus) {
         switch status {
         case .notAdded:
@@ -171,5 +225,71 @@ fileprivate class LoggingHandler: LoggingCallback {
     
     func logNonFatal(nsError: NSError) {
         // Log Firebase non-fatal
+    }
+}
+
+// The SDK installs the UXT bridge. This screen never reads or handles the PIN.
+private final class PinViewController: UIViewController, CSDKPinActionListener, WKNavigationDelegate {
+    private let card: Card
+    private let jwts: JWTs
+    private let onComplete: () -> Void
+    private let webView = WKWebView()
+    private var completed = false
+
+    init(card: Card, jwts: JWTs, onComplete: @escaping () -> Void) {
+        self.card = card
+        self.jwts = jwts
+        self.onComplete = onComplete
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) { fatalError("Use init(card:jwts:onComplete:)") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = "Set / change PIN"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .close, target: self, action: #selector(close))
+        view.backgroundColor = .systemBackground
+        webView.navigationDelegate = self
+        webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(webView)
+        NSLayoutConstraint.activate([
+            webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
+        CardsSdkProvider.shared.showCardPinManagement(
+            card: card, webView: webView, jwts: jwts, listener: self)
+    }
+
+    @objc private func close() { dismiss(animated: true) }
+
+    func onPinActionCompleted(_ action: CSDKPinAction) {
+        // Activation/reveal events do not mean that PIN setup has completed.
+        guard action == .setPin, !completed else { return }
+        completed = true
+        dismiss(animated: true, completion: onComplete)
+    }
+
+    func onPinActionFailed(_ action: CSDKPinAction, error: String?) {
+        showError(error ?? "PIN update failed. Retry in the page or close this screen.")
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        showError(error.localizedDescription)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        showError(error.localizedDescription)
+    }
+
+    private func showError(_ message: String) {
+        guard presentedViewController == nil else { return }
+        let alert = UIAlertController(title: "PIN management", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
